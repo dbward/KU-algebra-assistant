@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>College Algebra Assistant</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#E3F2FD 0%,#E8F5E9 100%)}
+  :root{
+    --blue:#1565C0;--blue-light:#42A5F5;--blue-pale:#E3F2FD;
+    --green:#2E7D32;--green-light:#66BB6A;--green-pale:#E8F5E9;
+    --gray:#546E7A;--gray-light:#ECEFF1;--white:#fff;
+    --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.12);
+  }
+
+  /* Full-height flex layout */
+  #app{display:flex;flex-direction:column;height:100vh;max-width:760px;margin:0 auto;padding:12px;gap:10px}
+
+  /* HEADER */
+  header{background:var(--blue-pale);border-radius:var(--radius);padding:14px 16px;border-left:5px solid var(--blue);box-shadow:var(--shadow);flex-shrink:0}
+  .logo{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .logo-icon{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow);flex-shrink:0}
+  h1{font-size:1.4rem;color:var(--blue);font-weight:800;letter-spacing:-.5px}
+  .tagline{color:#333;font-size:.88rem;margin-bottom:10px}
+  .chip-groups{display:flex;gap:12px;flex-wrap:wrap}
+  .chip-group{flex:1;min-width:140px}
+  .chip-group h4{font-size:.8rem;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+  .chip-group.info h4{color:var(--green)}
+  .chip-group.study h4{color:var(--blue)}
+  .chip{display:block;padding:4px 10px;border-radius:8px;font-size:.85rem;margin-bottom:3px;background:#f5f5e9;color:#333;cursor:pointer;transition:.15s}
+  .chip:hover{opacity:.75}
+  .prompt-label{font-size:.82rem;color:var(--gray);margin-bottom:6px}
+
+  /* MESSAGES */
+  #messages{flex:1;overflow-y:auto;background:var(--white);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+  .msg{max-width:85%;padding:10px 14px;border-radius:var(--radius);line-height:1.5;font-size:.92rem}
+  .msg.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+  .msg.bot{align-self:flex-start;background:var(--blue-pale);color:#1a1a1a;border-bottom-left-radius:4px;border-left:4px solid var(--blue-light)}
+  .msg.bot.thinking{opacity:.7;font-style:italic}
+
+  /* INPUT */
+  .chat-input-row{display:flex;gap:8px;padding:10px 14px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);flex-shrink:0}
+  #user-input{flex:1;padding:10px 14px;border:2px solid var(--blue-light);border-radius:24px;font-size:.95rem;outline:none;transition:.2s}
+  #user-input:focus{border-color:var(--blue)}
+  #send-btn{background:var(--blue);color:#fff;border:none;border-radius:24px;padding:10px 22px;font-weight:700;cursor:pointer;font-size:.95rem;transition:.2s;white-space:nowrap}
+  #send-btn:hover{background:var(--blue-light)}
+  #send-btn:disabled{opacity:.5;cursor:not-allowed}
+
+  @media(max-width:500px){h1{font-size:1.1rem}.msg{max-width:95%}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">📐</div>
+      <h1>Algebra Assistant</h1>
+    </div>
+    <p class="tagline">I'm your College Algebra study companion. I can help you think through algebra concepts, find due dates, and understand course policies. I won't give you answers, but I will help you find them!</p>
+    <p class="prompt-label">Try asking me about:</p>
+    <div class="chip-groups">
+      <div class="chip-group info">
+        <h4>📋 Course Information</h4>
+        <span class="chip" onclick="fillInput('When is [assignment name] due?')">📅 Due dates</span>
+        <span class="chip" onclick="fillInput('What is the policy for late assignments?')">📄 Course policies</span>
+      </div>
+      <div class="chip-group study">
+        <h4>📚 Study Assistance</h4>
+        <span class="chip" onclick="fillInput('Can you help me understand [concept] from the textbook?')">📖 Textbook concepts</span>
+        <span class="chip" onclick="fillInput('Can you create a study guide for [topic]?')">🧠 Study guides</span>
+        <span class="chip" onclick="fillInput('Can you give me practice problems for [topic]?')">🧪 Practice problems</span>
+        <span class="chip" onclick="fillInput('How should I approach [topic or problem type]?')">❓ How to approach a topic</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="messages"></div>
+
+  <div class="chat-input-row">
+    <input id="user-input" type="text" placeholder="Ask me anything about the course..." maxlength="1000"/>
+    <button id="send-btn" onclick="sendMessage()">Send</button>
+  </div>
+
+</div>
+
+<script>
+const SYLLABUS = `Math 101 ONLINE – College Algebra | Section #14871, Fall 2025
+Instructor: Dr. Alex Schaefer (Alex) | Email: alex.scha4@ku.edu
+
+COURSE DESCRIPTION: 3 credit-hour course fulfilling KU mathematics requirement. Covers algebraic principles, equations and inequalities (analytic and graphical), and functions through multiple representations. Units: (1) Functions—Language & Tools, (2) Linear & Quadratic Functions, (3) Polynomial & Rational Functions, (4) Exponential & Logarithmic Functions, (5) Linear & Non-linear Systems.
+
+INSTRUCTIONAL APPROACH: Canvas for syllabus, videos, written HW, grades, and WebAssign access. WebAssign for online HW. Access WebAssign ONLY through Canvas.
+
+ASSIGNMENTS:
+- Written Assignments (5 pts each, 26 total): Complete on paper, scan, submit to Canvas. Due at end of unit but do them as you go. Graded on work/completion. NO late accepted.
+- WebAssign Assignments (10 pts each, 20 total): Late accepted with extension. Request extension in WA within 1 week of due date; then 1 more week to finish. Penalty: 20% on unsubmitted problems. Max 20 submissions per assignment—don't submit after every problem.
+- Exams: 2 Midterms + 1 cumulative Final. In-person, proctored, at approved testing center. Closed book/notes/internet. TI-83 or TI-84 calculator required.
+
+GRADING: WA (200 pts) + Written HW (130 pts) + Midterm 1 (150) + Midterm 2 (150) + Final (200) = 830 pts total, graded out of 780.
+Scale: A=90–100%, B=80–90%, C=70–80%, D=60–70%, F=below 60%
+
+REQUIRED MATERIALS: Reliable computer/internet; TI-83 or TI-84 calculator; Math 101 Guided Notes & Practice 2025–2026 (~$30, KU Bookstore); WebAssign access (buy via Canvas); Optional: OpenStax College Algebra 2e (free).
+
+HELP: Help Room, 323 Strong Hall, M–R 9AM–6PM, F 9AM–4PM (free drop-in). Email instructor; office 323C Strong Hall; Zoom available. SAC for accommodations: Strong 22, 785-864-4064, access.ku.edu.
+
+ACADEMIC INTEGRITY: Unauthorized aid, plagiarism, cheating carry very serious penalties per University Senate Rules Section 6.`;
+
+const SCHEDULE = `COURSE SCHEDULE – Fall 2025 (most due dates MWF)
+
+UNIT 1: Functions – Language & Tools
+WA0 (10pts) Due Fri 8/22 | WA1 (10pts) Due Fri 8/22 | WA2 (10pts) Due Wed 8/27 | WA3 (10pts) Due Fri 8/29 | WA4 (10pts) Due Wed 9/03
+Written HW 1-1, 1-2, 1-3, 1-4, 1-5 (5pts each) ALL due Fri 9/05 — NO late accepted
+
+UNIT 2: Linear & Quadratic Functions
+WA5 (10pts) Due Wed 9/10 | WA6 (10pts) Due Fri 9/12 | WA7 (10pts) Due Wed 9/17 | WA8 (10pts) Due Fri 9/19 | WA9 (10pts) Due Mon 9/22
+Written HW 2-1, 2-2, 2-3, 2-4, 2-5 (5pts each) ALL due Wed 9/24 — NO late accepted
+*** MIDTERM 1 EXAM (Units 1–2): Thu 9/25 or Fri 9/26 — in-person, proctored ***
+
+UNIT 3: Polynomial & Rational Functions
+WA10 (10pts) Due Wed 10/01 | WA11 (10pts) Due Wed 10/08 | WA12 (10pts) Due Wed 10/15 | WA13 (10pts) Due Wed 10/22
+Written HW 3-1, 3-2, 3-3, 3-4, 3-5, 3-6 (5pts each) ALL due Fri 10/24 — NO late accepted
+
+UNIT 4: Exponential & Logarithmic Functions
+WA14 (10pts) Due Wed 10/29 | WA15 (10pts) Due Fri 10/31 | WA16 (10pts) Due Wed 11/05 | WA17 (10pts) Due Mon 11/10
+Written HW 4-1, 4-2, 4-3, 4-4, 4-5, 4-6 (5pts each) ALL due Wed 11/12 — NO late accepted
+*** MIDTERM 2 EXAM (Units 3–4): Thu 11/13 or Fri 11/14 — in-person, proctored ***
+
+UNIT 5: Linear & Nonlinear Systems
+WA18 (10pts) Due Fri 11/21 | WA19 (10pts) Due Mon 12/01
+Written HW 5-1, 5-2, 5-3, 5-4 (5pts each) ALL due Thu 12/04 — NO late accepted
+*** CUMULATIVE FINAL EXAM: Wed 12/10 — in-person, proctored ***`;
+
+const TEXTBOOK = `TEXTBOOK REFERENCE: OpenStax College Algebra 2e — Condensed Chapter Summaries
+
+== CHAPTER 1: PREREQUISITES ==
+1.1 Real Numbers: Natural numbers (counting), Whole (natural+0), Integers (whole+negatives), Rational (fractions p/q, expressed as terminating or repeating decimals), Irrational (non-repeating, non-terminating; e.g. sqrt(2), pi), Real (rational+irrational). Order of Operations: PEMDAS. Properties: Commutative (a+b=b+a; ab=ba), Associative ((a+b)+c=a+(b+c)), Distributive (a(b+c)=ab+ac), Identity (a+0=a; a*1=a), Inverse (a+(-a)=0; a*(1/a)=1). Evaluating algebraic expressions: substitute values for variables and simplify.
+1.2 Exponents: Product rule: a^m*a^n=a^(m+n). Quotient rule: a^m/a^n=a^(m-n). Power rule: (a^m)^n=a^(mn). Zero exponent: a^0=1. Negative exponent: a^(-n)=1/a^n. Power of product: (ab)^n=a^n*b^n. Power of quotient: (a/b)^n=a^n/b^n. Scientific notation: c×10^n where 1≤c<10.
+1.3 Radicals & Rational Exponents: Principal square root is nonnegative. Product rule: sqrt(ab)=sqrt(a)*sqrt(b). Quotient rule: sqrt(a/b)=sqrt(a)/sqrt(b). Add/subtract radicals only with same radicand. Rationalize denominators by multiplying by conjugate. Rational exponents: a^(m/n) = (nth-root of a)^m.
+1.4 Polynomials: Degree = highest exponent. Monomial/binomial/trinomial. Add/subtract by combining like terms. Multiply using distributive property or FOIL. Perfect square: (a±b)^2=a^2±2ab+b^2. Difference of squares: (a+b)(a-b)=a^2-b^2.
+1.5 Factoring: Always check GCF first. Trinomial (leading coeff=1): find two numbers with product=c, sum=b. Factoring by grouping for leading coeff≠1. Perfect square trinomials. Difference of squares: a^2-b^2=(a+b)(a-b). Sum of cubes: a^3+b^3=(a+b)(a^2-ab+b^2). Difference of cubes: a^3-b^3=(a-b)(a^2+ab+b^2).
+1.6 Rational Expressions: Simplify by factoring and canceling common factors. Multiply: factor, multiply, simplify. Divide: multiply by reciprocal. Add/subtract: find LCD, rewrite, combine numerators. Complex rational expressions: simplify numerator and denominator separately, then divide.
+
+== CHAPTER 2: EQUATIONS AND INEQUALITIES ==
+2.1 Coordinate Systems & Graphs: Cartesian plane: x-axis (horizontal), y-axis (vertical), origin (0,0), four quadrants. Ordered pairs (x,y). x-intercept: set y=0. y-intercept: set x=0. Distance formula: d=sqrt((x2-x1)^2+(y2-y1)^2). Midpoint formula: ((x1+x2)/2,(y1+y2)/2).
+2.2 Linear Equations: ax+b=0. Types: identity (all reals), conditional (one solution), inconsistent (no solution). Rational equations: multiply by LCD, check excluded values. Slope: m=(y2-y1)/(x2-x1). Slope-intercept: y=mx+b. Point-slope: y-y1=m(x-x1). Standard form: ax+by=c. Vertical: x=c (undefined slope). Horizontal: y=c (slope=0). Parallel lines: equal slopes. Perpendicular: slopes are negative reciprocals (m1*m2=-1).
+2.3 Models & Applications: Translate word problems to linear equations. Key formulas: d=rt, P=2l+2w, A=lw, V=lwh.
+2.4 Complex Numbers: i=sqrt(-1), i^2=-1. Standard form: a+bi. Add/subtract: combine real and imaginary parts. Multiply: FOIL, replace i^2 with -1. Divide: multiply by complex conjugate (a-bi). Powers of i cycle with period 4: i,−1,−i,1.
+2.5 Quadratic Equations: ax^2+bx+c=0. Methods: (1) Factoring + zero-product property, (2) Square root property, (3) Completing the square, (4) Quadratic formula: x=(-b±sqrt(b^2-4ac))/(2a). Discriminant b^2-4ac: >0 two real solutions, =0 one real solution, <0 two complex solutions. Pythagorean theorem: a^2+b^2=c^2.
+2.6 Other Equations: Rational exponents: raise both sides to reciprocal power. Polynomial equations: factor using GCF, grouping, special forms. Radical equations: isolate radical, raise to nth power, check for extraneous solutions. Absolute value: |X|=a means X=a or X=-a. Quadratic form: substitute u for middle-term variable, solve as quadratic.
+2.7 Inequalities: Interval notation uses parentheses (strict) and brackets (inclusive); infinity always uses parentheses. Multiplying/dividing by negative reverses inequality. Compound inequalities: solve both parts. Absolute value inequalities: |X|<a means -a<X<a; |X|>a means X<-a or X>a.
+
+== CHAPTER 3: FUNCTIONS (Unit 1) ==
+3.1 Functions & Notation: A function assigns exactly one output to each input. Vertical line test for graphs. Function notation: f(x). Domain: all valid inputs. Range: all possible outputs. Piecewise functions: different rules for different parts of domain.
+3.2 Domain & Range: Domain restrictions: denominators≠0, radicands of even roots≥0. Express in interval notation. Range found by analyzing graph or algebraically. For f(x)=sqrt(x-a): domain is [a,∞).
+3.3 Rates of Change & Graph Behavior: Average rate of change = (f(b)-f(a))/(b-a) = slope of secant line. Increasing: rises left to right. Decreasing: falls left to right. Local maximum/minimum: turning points. Absolute (global) max/min.
+3.4 Composition of Functions: (f∘g)(x)=f(g(x)). Apply inner function first, then outer. Domain of composition: inputs valid in g whose outputs are valid in f.
+3.5 Transformations: Vertical shift: f(x)+k (up k). Horizontal shift: f(x-h) (right h). Vertical stretch/compression: a*f(x). Horizontal stretch/compression: f(bx). Reflection over x-axis: -f(x). Reflection over y-axis: f(-x). Order matters when combining transformations.
+3.6 Absolute Value Functions: f(x)=|x|, V-shaped graph, vertex at origin. f(x)=a|x-h|+k: vertex at (h,k), opens up if a>0, down if a<0. |a|>1 narrows; 0<|a|<1 widens.
+3.7 Inverse Functions: f⁻¹ reverses f. Horizontal line test: one-to-one functions have inverses. To find inverse: swap x and y, solve for y. f(f⁻¹(x))=x and f⁻¹(f(x))=x. Graphs of f and f⁻¹ are reflections over y=x.
+
+== CHAPTER 4: LINEAR FUNCTIONS (Unit 2) ==
+4.1 Linear Functions: f(x)=mx+b. Constant rate of change = slope m. y-intercept = b. Graph is a straight line. Increasing if m>0, decreasing if m<0, constant if m=0. Slope = (change in y)/(change in x). x-intercept: set f(x)=0.
+4.2 Modeling with Linear Functions: Identify slope as rate of change with units. Identify y-intercept as initial value. Write equation from two points or from slope and one point. Interpret slope and intercept in context of real-world problems.
+4.3 Fitting Linear Models to Data: Scatter plots show relationship between two variables. Line of best fit (linear regression) minimizes distance from data points. Correlation coefficient r: close to 1 or -1 means strong linear relationship; close to 0 means weak. Interpolation (within data range) vs. extrapolation (outside data range; less reliable).
+
+== CHAPTER 5: POLYNOMIAL & RATIONAL FUNCTIONS (Unit 3) ==
+5.1 Quadratic Functions: f(x)=ax^2+bx+c or vertex form f(x)=a(x-h)^2+k. Parabola: opens up if a>0, down if a<0. Vertex: (h,k) or x=-b/(2a). Axis of symmetry: x=h. y-intercept: f(0). x-intercepts: solve f(x)=0. Domain: all reals. Range: [k,∞) if a>0; (-∞,k] if a<0.
+5.2 Power & Polynomial Functions: Power function: f(x)=kx^n. Even degree: both ends same direction. Odd degree: ends go opposite directions. Leading coefficient determines end behavior. Degree n polynomial has at most n real zeros and n-1 turning points.
+5.3 Graphs of Polynomials: Zeros/x-intercepts found by factoring or quadratic formula. Multiplicity of a zero: if even, graph touches and bounces; if odd, graph crosses. End behavior determined by leading term. Intermediate Value Theorem: if f(a) and f(b) have opposite signs, there is a zero between a and b.
+5.4 Dividing Polynomials: Long division: dividend = divisor × quotient + remainder. Synthetic division: shortcut when dividing by (x-c). Remainder theorem: f(c) = remainder when divided by (x-c). Factor theorem: (x-c) is a factor iff f(c)=0.
+5.5 Zeros of Polynomials: Rational Zero Theorem: possible rational zeros are ±(factors of constant)/(factors of leading coefficient). Fundamental Theorem of Algebra: degree-n polynomial has exactly n zeros (counting complex and repeated). Complex zeros come in conjugate pairs. Descartes' Rule of Signs estimates number of positive/negative real zeros.
+5.6 Rational Functions: f(x)=p(x)/q(x). Domain: q(x)≠0. Vertical asymptotes: where denominator=0 (after canceling common factors). Horizontal asymptotes: compare degrees of numerator and denominator (if deg num < deg denom: y=0; if equal: y=leading coefficients ratio; if num > denom: no HA, possible oblique asymptote). Holes: where common factors cancel. x-intercepts: where numerator=0.
+5.7 Inverses & Radical Functions: Inverse of f(x)=x^n is f⁻¹(x)=x^(1/n). Radical functions are inverses of power functions. Domain restrictions required for even roots. To find inverse: swap x and y, solve for y.
+5.8 Variation: Direct variation: y=kx. Inverse variation: y=k/x. Joint variation: y=kxz. Combined variation mixes types. k is the constant of variation; find k from given values.
+
+== CHAPTER 6: EXPONENTIAL & LOGARITHMIC FUNCTIONS (Unit 4) ==
+6.1 Exponential Functions: f(x)=ab^x where b>0, b≠1. If b>1: exponential growth. If 0<b<1: exponential decay. Natural base: e≈2.718. f(x)=ae^(kx): growth if k>0, decay if k<0. y-intercept always at (0,a). Horizontal asymptote: y=0.
+6.2 Graphs of Exponential Functions: f(x)=b^x passes through (0,1) and (1,b). Transformations shift/reflect/stretch the graph. Asymptote shifts with vertical transformations.
+6.3 Logarithmic Functions: log_b(x)=y means b^y=x. Inverse of exponential. Common log: log(x)=log_10(x). Natural log: ln(x)=log_e(x). Domain: x>0. Range: all reals. Key point: (1,0) since log_b(1)=0. Vertical asymptote: x=0.
+6.4 Graphs of Logarithmic Functions: log_b(x) increases if b>1, decreases if 0<b<1. Transformations apply similarly to other functions. log_b(x) and b^x are reflections over y=x.
+6.5 Logarithm Properties: Product rule: log_b(MN)=log_b(M)+log_b(N). Quotient rule: log_b(M/N)=log_b(M)-log_b(N). Power rule: log_b(M^p)=p*log_b(M). Change of base: log_b(M)=log(M)/log(b)=ln(M)/ln(b).
+6.6 Exponential & Log Equations: To solve exponential equations: isolate base, take log of both sides, apply power rule. To solve log equations: use properties to condense to single log, convert to exponential form, solve, check domain. Extraneous solutions possible.
+6.7 Exponential & Log Models: Exponential growth: A=A_0*e^(kt), k>0. Exponential decay: A=A_0*e^(kt), k<0. Half-life: t_(1/2)=ln(2)/k. Doubling time: t=ln(2)/k. Logistic growth: f(x)=c/(1+ae^(-bx)), has carrying capacity c.
+6.8 Fitting Exponential Models: Use two points to find a and b in y=ab^x. Logarithmic regression on calculator. Evaluate fit using residuals.
+
+== CHAPTER 7: SYSTEMS OF EQUATIONS & INEQUALITIES (Unit 5) ==
+7.1 Systems of Linear Equations (2 variables): Solution is the intersection point(s). Methods: graphing, substitution, elimination. Types: consistent independent (one solution), consistent dependent (infinite solutions, same line), inconsistent (no solution, parallel lines).
+7.2 Systems of Linear Equations (3 variables): Three equations, three unknowns. Use elimination to reduce to 2×2 system, then solve. Solutions: one point, no solution, or infinite solutions (plane/line intersections).
+7.3 Nonlinear Systems: At least one equation is nonlinear (quadratic, etc.). Solve by substitution. Can have 0, 1, 2, or more intersection points. Combine with graphing to verify solutions.
+7.4 Partial Fractions: Decompose a rational expression into sum of simpler fractions. Cases: distinct linear factors, repeated linear factors, irreducible quadratic factors. Set up system of equations by matching numerator coefficients.
+7.5 Matrices & Operations: Matrix: rectangular array of numbers. Dimensions: m×n (rows×columns). Add/subtract: same dimensions, add corresponding entries. Scalar multiplication: multiply every entry by scalar. Matrix multiplication: (m×n)(n×p)=(m×p); not commutative.
+7.6 Gaussian Elimination: Augmented matrix represents a system. Row operations: swap rows, multiply row by nonzero scalar, add multiple of one row to another. Goal: row echelon form, then back-substitution. Reduced row echelon form (RREF): identity matrix on left.
+7.7 Solving Systems with Inverses: Square matrix A has inverse A⁻¹ if AA⁻¹=I. System AX=B solved by X=A⁻¹B. Find inverse using row reduction or formula for 2×2: if A=[[a,b],[c,d]], A⁻¹=(1/det)*[[d,-b],[-c,a]] where det=ad-bc.
+7.8 Cramer's Rule: Uses determinants to solve systems. For 2×2: x=Dx/D, y=Dy/D where D=det of coefficient matrix. Works when D≠0. For 3×3: extend to three determinants.`;
+
+const STATE = { history: [] };
+
+function fillInput(prompt) {
+  const inp = document.getElementById('user-input');
+  inp.value = prompt;
+  inp.focus();
+  inp.setSelectionRange(inp.value.length, inp.value.length);
+}
+
+function buildSystemPrompt() {
+  return `You are a helpful assistant for Math 101 Online – College Algebra, Section #14871, Fall 2025, at the University of Kansas. The instructor is Dr. Alex Schaefer (alex.scha4@ku.edu).
+
+Your Role: Support students in three areas: (1) course operations and logistics, (2) content learning through Socratic guidance, and (3) study skill development. Your overarching goal is to help students become confident, self-guided learners.
+
+Course Knowledge: You have access to the course syllabus, course schedule, and OpenStax College Algebra 2e textbook summaries (Chapters 1–7). Use these as your primary reference materials. When answering questions about due dates, policies, or course logistics, refer specifically to these documents. When helping with content, use the textbook as your reference but do not quote it directly or provide answers from it.
+
+Socratic Tutoring Approach: Always guide rather than tell. Ask guiding questions that help students reason through problems themselves. Encourage students to articulate what they already know before introducing new ideas. Use analogies, examples, and hypothetical scenarios to illustrate concepts. When a student makes an error, ask questions that help them find the mistake rather than correcting it directly. Offer incremental hints rather than full explanations. Ask one guiding question at a time.
+
+You may create: study guides, practice quizzes, concept maps, step-by-step reasoning prompts, and hypothetical scenarios.
+
+Course Operations: Provide clear, accurate information about due dates, assignment formats, and policies. Reference the syllabus or schedule specifically when relevant. If information is not available, say so and suggest contacting Dr. Schaefer.
+
+Grades: Do not discuss, speculate about, or help calculate grades. If asked anything grade-related, respond with: "You'll have to talk with your instructor about that."
+
+Tone: Be supportive, patient, and professional. Do not compliment students. Avoid being overly enthusiastic. Be concise.
+
+Prohibited: Do not solve math problems or equations from assignments. Do not complete WebAssign problems. Do not write papers. Do not complete quizzes or exams. Do not provide direct textbook answers. Do not generate inappropriate content.
+
+Encourage self-sufficiency: Remind students that working through problems themselves is how learning happens. Encourage use of the Help Room (323 Strong Hall, M–R 9AM–6PM, F 9AM–4PM) for additional support.
+
+--- SYLLABUS ---
+${SYLLABUS}
+
+--- COURSE SCHEDULE ---
+${SCHEDULE}
+
+--- TEXTBOOK REFERENCE ---
+${TEXTBOOK}`;
+}
+
+function addMsg(role, text) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.innerHTML = text.replace(/\n/g,'<br>');
+  const msgs = document.getElementById('messages');
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+
+async function sendMessage() {
+  const inp = document.getElementById('user-input');
+  const btn = document.getElementById('send-btn');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  btn.disabled = true;
+  addMsg('user', text);
+  STATE.history.push({role:'user', content: text});
+  const thinking = addMsg('bot','⏳ Thinking...');
+  thinking.classList.add('thinking');
+  try {
+    const res = await fetch('https://algebra-app.dbward2119.workers.dev/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:700,
+        system: buildSystemPrompt(),
+        messages: STATE.history
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(b=>b.text||'').join('\n') || 'Sorry, I had trouble responding. Please try again.';
+    thinking.remove();
+    addMsg('bot', reply);
+    STATE.history.push({role:'assistant', content: reply});
+    if (STATE.history.length > 40) STATE.history = STATE.history.slice(-40);
+  } catch(e) {
+    thinking.remove();
+    addMsg('bot','⚠️ Connection error. Please check your network and try again.');
+  }
+  btn.disabled = false;
+  inp.focus();
+}
+
+document.getElementById('user-input').addEventListener('keydown', e => {
+  if (e.key==='Enter' && !e.shiftKey){e.preventDefault();sendMessage();}
+});
+</script>
+</body>
+</html>
