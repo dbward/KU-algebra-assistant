@@ -25,4 +25,4 @@ through Socratic guidance rather than direct answers.
 - dbward@ku.edu
 - 
 ### Links
-- Live app: https://dbward.github.io/algebra-assistant
+- Live app: https://dbward.github.io/KU-algebra-assistant/
