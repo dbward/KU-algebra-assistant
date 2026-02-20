@@ -25,8 +25,4 @@ through Socratic guidance rather than direct answers.
 - dbward@ku.edu
 - 
 ### Links
-- Live app: https://yourusername.github.io/algebra-assistant
-- Cloudflare Worker: https://algebra-app.dbward2119.workers.dev- 
-When you're done editing, scroll down and click **Commit changes** to save.
-
-Would you like to add or change anything in the documentation?
+- Live app: https://dbward.github.io/algebra-assistant
