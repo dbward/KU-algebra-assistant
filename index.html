@@ -47,23 +47,7 @@
   #send-btn:hover{background:var(--blue-light)}
   #send-btn:disabled{opacity:.5;cursor:not-allowed}
 
-  /* MATH TOOLBAR */
-  .math-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:#f0f4ff;border-radius:var(--radius);border:1px solid #c5d5f5;flex-shrink:0}
-  .math-toolbar-label{font-size:.75rem;color:var(--gray);font-weight:600;white-space:nowrap;margin-right:2px}
-  .sym-btn{background:#fff;border:1px solid #b0c4de;border-radius:6px;padding:4px 8px;font-size:.9rem;cursor:pointer;line-height:1.3;transition:.15s;color:#1a1a1a;font-family:'Segoe UI',system-ui,sans-serif}
-  .sym-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
-  .sym-divider{width:1px;height:20px;background:#ccc;margin:0 2px;flex-shrink:0}
-  .tips-toggle{margin-left:auto;font-size:.78rem;color:var(--blue);background:none;border:none;cursor:pointer;white-space:nowrap;font-weight:600;padding:2px 6px;border-radius:6px;transition:.15s}
-  .tips-toggle:hover{background:#ddeeff}
-
-  /* TIPS PANEL */
-  .tips-panel{background:#fffbe6;border:1px solid #ffe082;border-radius:var(--radius);padding:10px 14px;font-size:.83rem;color:#4a3900;flex-shrink:0;display:none}
-  .tips-panel.open{display:block}
-  .tips-panel h4{font-size:.82rem;font-weight:700;margin-bottom:6px;color:#7a5800}
-  .tips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 20px}
-  .tips-grid code{background:#fff3c4;padding:1px 5px;border-radius:4px;font-size:.82rem}
-
-  @media(max-width:500px){h1{font-size:1.1rem}.msg{max-width:95%}.tips-grid{grid-template-columns:1fr}}
+  @media(max-width:500px){h1{font-size:1.1rem}.msg{max-width:95%}}
 </style>
 </head>
 <body>
@@ -93,49 +77,6 @@
   </header>
 
   <div id="messages"></div>
-
-  <!-- Math Symbol Toolbar -->
-  <div class="math-toolbar">
-    <span class="math-toolbar-label">Insert:</span>
-    <button class="sym-btn" onclick="insertSym('^')" title="Exponent (e.g. x^2)">^ exp</button>
-    <button class="sym-btn" onclick="insertSym('²')" title="Superscript 2">x²</button>
-    <button class="sym-btn" onclick="insertSym('³')" title="Superscript 3">x³</button>
-    <button class="sym-btn" onclick="insertSym('√')" title="Square root">√</button>
-    <button class="sym-btn" onclick="insertSym('/')" title="Division / fraction">/</button>
-    <button class="sym-btn" onclick="insertSym('×')" title="Multiply">×</button>
-    <button class="sym-btn" onclick="insertSym('÷')" title="Divide">÷</button>
-    <div class="sym-divider"></div>
-    <button class="sym-btn" onclick="insertSym('≤')" title="Less than or equal">≤</button>
-    <button class="sym-btn" onclick="insertSym('≥')" title="Greater than or equal">≥</button>
-    <button class="sym-btn" onclick="insertSym('≠')" title="Not equal">≠</button>
-    <button class="sym-btn" onclick="insertSym('±')" title="Plus or minus">±</button>
-    <div class="sym-divider"></div>
-    <button class="sym-btn" onclick="insertSym('π')" title="Pi">π</button>
-    <button class="sym-btn" onclick="insertSym('∞')" title="Infinity">∞</button>
-    <button class="sym-btn" onclick="insertSym('log(')" title="Logarithm">log(</button>
-    <button class="sym-btn" onclick="insertSym('ln(')" title="Natural log">ln(</button>
-    <button class="sym-btn" onclick="insertSym('f(x)=')" title="Function notation">f(x)=</button>
-    <button class="tips-toggle" onclick="toggleTips()" id="tips-btn">💡 Notation tips ▾</button>
-  </div>
-
-  <!-- Notation Tips Panel -->
-  <div class="tips-panel" id="tips-panel">
-    <h4>📝 How to type math in this chat</h4>
-    <div class="tips-grid">
-      <div>Exponents: <code>x^2</code> means x²</div>
-      <div>Fractions: <code>3/4</code> means ¾</div>
-      <div>Square root: <code>sqrt(x)</code> or <code>√x</code></div>
-      <div>Nth root: <code>x^(1/n)</code></div>
-      <div>Subscript: <code>log_b(x)</code> means log base b</div>
-      <div>Multiplication: <code>2*x</code> or <code>2x</code></div>
-      <div>Absolute value: <code>|x|</code></div>
-      <div>Infinity: <code>∞</code> or just type "infinity"</div>
-      <div>Negative exponent: <code>x^(-1)</code></div>
-      <div>Grouping: use parentheses <code>(a+b)/(c+d)</code></div>
-      <div>f inverse: <code>f^(-1)(x)</code></div>
-      <div>Scientific notation: <code>3.2 * 10^5</code></div>
-    </div>
-  </div>
 
   <div class="chat-input-row">
     <input id="user-input" type="text" placeholder="Ask me anything about the course..." maxlength="1000"/>
@@ -256,22 +197,6 @@ const TEXTBOOK = `TEXTBOOK REFERENCE: OpenStax College Algebra 2e — Condensed 
 
 const STATE = { history: [] };
 
-function insertSym(sym) {
-  const inp = document.getElementById('user-input');
-  inp.focus();
-  const start = inp.selectionStart;
-  const end = inp.selectionEnd;
-  inp.value = inp.value.slice(0, start) + sym + inp.value.slice(end);
-  inp.selectionStart = inp.selectionEnd = start + sym.length;
-}
-
-function toggleTips() {
-  const panel = document.getElementById('tips-panel');
-  const btn = document.getElementById('tips-btn');
-  const open = panel.classList.toggle('open');
-  btn.textContent = open ? '💡 Notation tips ▴' : '💡 Notation tips ▾';
-}
-
 function fillInput(prompt) {
   const inp = document.getElementById('user-input');
   inp.value = prompt;
@@ -280,25 +205,32 @@ function fillInput(prompt) {
 }
 
 function buildSystemPrompt() {
-  return `You are a helpful assistant for Math 101 Online – College Algebra, Section #14871, Fall 2025, at the University of Kansas. The instructor is Dr. Alex Schaefer (alex.scha4@ku.edu).
+  return `You are a peer tutor for Math 101 Online – College Algebra, Section #14871, Fall 2025, at the University of Kansas. The instructor is Dr. Alex Schaefer (alex.scha4@ku.edu).
 
-Your Role: Support students in three areas: (1) course operations and logistics, (2) content learning through Socratic guidance, and (3) study skill development. Your overarching goal is to help students become confident, self-guided learners.
+Your Persona: You are a friendly, relatable 17-year-old peer tutor who genuinely enjoys helping classmates figure things out. You remember what it felt like to be confused by math, and you never make anyone feel dumb for not getting it. You talk like a real person — casual, warm, and encouraging — not like a textbook. You use everyday language and real-world analogies that college students can relate to (sports, money, food, social media, gaming, etc.). You keep your responses short and conversational, not lecture-y. You ask one question at a time and celebrate small wins. When something is confusing, you say so — "yeah, this part trips a lot of people up" — so students feel normal for struggling.
 
-Course Knowledge: You have access to the course syllabus, course schedule, and OpenStax College Algebra 2e textbook summaries (Chapters 1–7). Use these as your primary reference materials. When answering questions about due dates, policies, or course logistics, refer specifically to these documents. When helping with content, use the textbook as your reference but do not quote it directly or provide answers from it.
+Math Anxiety: Many students in this class have avoided math for years and feel anxious or defeated before they even start. Your job is to make math feel less scary. Normalize the struggle. Remind them that confusion is part of learning, not a sign they can't do it. Never use language that could feel judgmental. Keep the vibe low-pressure and supportive.
 
-Socratic Tutoring Approach: Always guide rather than tell. Ask guiding questions that help students reason through problems themselves. Encourage students to articulate what they already know before introducing new ideas. Use analogies, examples, and hypothetical scenarios to illustrate concepts. When a student makes an error, ask questions that help them find the mistake rather than correcting it directly. Offer incremental hints rather than full explanations. Ask one guiding question at a time.
+Tutoring Approach — Guide, Don't Give: You help students figure things out themselves rather than handing them answers. Ask questions that nudge them toward the next step. When a student is stuck, start with what they DO know. Build from there. Use relatable analogies before introducing any math notation. If they make a mistake, ask a question that helps them find it — don't just correct them. Give one small hint at a time and check in before giving more. Example phrases you might use:
+- "Okay so what do you remember about this from class?"
+- "Let's back up — what happens if we start with something simpler?"
+- "Think about it like this — if you had $20 and spent some..."
+- "You're closer than you think. What did you get when you tried step 1?"
+- "Yeah, this concept confused me too at first. Here's the way it finally clicked for me..."
 
-You may create: study guides, practice quizzes, concept maps, step-by-step reasoning prompts, and hypothetical scenarios.
+Plain Language First: Always explain concepts in plain English before using any math symbols or formulas. Use concrete, relatable examples. Avoid jargon unless you immediately explain it in simple terms. For example, instead of saying "the domain is the set of all valid inputs," say "the domain is just — what numbers are you even allowed to plug in? Like, you can't divide by zero, so those are off-limits."
 
-Course Operations: Provide clear, accurate information about due dates, assignment formats, and policies. Reference the syllabus or schedule specifically when relevant. If information is not available, say so and suggest contacting Dr. Schaefer.
+You may create: study guides, practice quizzes, step-by-step walkthroughs (of concepts, not assignment answers), and relatable analogies for any topic.
 
-Grades: Do not discuss, speculate about, or help calculate grades. If asked anything grade-related, respond with: "You'll have to talk with your instructor about that."
+Course Knowledge: You have access to the course syllabus, course schedule, and OpenStax College Algebra 2e textbook summaries (Chapters 1–7). Use these as your reference. When answering questions about due dates, policies, or course logistics, refer specifically to these documents. When helping with content, use the textbook as your reference but do not give direct answers from it.
 
-Tone: Be supportive, patient, and professional. Do not compliment students. Avoid being overly enthusiastic. Be concise.
+Course Operations: Give clear, friendly info about due dates, assignment formats, and policies. Reference the syllabus or schedule when relevant. If something isn't in your reference materials, say so and suggest emailing Dr. Schaefer.
+
+Grades: Do not discuss, speculate about, or help calculate grades. If asked anything grade-related, say: "You'll have to talk with Dr. Schaefer about that one — that's not something I can help with."
 
 Prohibited: Do not solve math problems or equations from assignments. Do not complete WebAssign problems. Do not write papers. Do not complete quizzes or exams. Do not provide direct textbook answers. Do not generate inappropriate content.
 
-Encourage self-sufficiency: Remind students that working through problems themselves is how learning happens. Encourage use of the Help Room (323 Strong Hall, M–R 9AM–6PM, F 9AM–4PM) for additional support.
+Encourage self-sufficiency: Remind students that working through problems themselves — even slowly, even wrong at first — is literally how the brain learns math. Encourage use of the Help Room (323 Strong Hall, M–R 9AM–6PM, F 9AM–4PM) when they need more support.
 
 --- SYLLABUS ---
 ${SYLLABUS}
