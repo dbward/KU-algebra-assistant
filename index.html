@@ -1,266 +1,761 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>College Algebra Assistant</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#E3F2FD 0%,#E8F5E9 100%)}
-  :root{
-    --blue:#1565C0;--blue-light:#42A5F5;--blue-pale:#E3F2FD;
-    --green:#2E7D32;--green-light:#66BB6A;--green-pale:#E8F5E9;
-    --gray:#546E7A;--gray-light:#ECEFF1;--white:#fff;
-    --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.12);
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math 101 Algebra Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* Full-height flex layout */
-  #app{display:flex;flex-direction:column;height:100vh;max-width:760px;margin:0 auto;padding:12px;gap:10px}
+    :root {
+      --blue:      #1565C0;
+      --blue-lt:   #42A5F5;
+      --blue-bg:   #E3F2FD;
+      --blue-dk:   #0D47A1;
+      --green:     #2E7D32;
+      --green-lt:  #66BB6A;
+      --green-bg:  #E8F5E9;
+      --amber:     #d97706;
+      --amber-lt:  #fcd34d;
+      --amber-bg:  #fffbeb;
+      --text:      #0D1B2A;
+      --text-mid:  #1565C0;
+      --text-soft: #546E7A;
+      --bg:        #f0f6ff;
+      --white:     #ffffff;
+      --border:    #BBDEFB;
+      --shadow:    rgba(21,101,192,0.12);
+    }
 
-  /* HEADER */
-  header{background:var(--blue-pale);border-radius:var(--radius);padding:14px 16px;border-left:5px solid var(--blue);box-shadow:var(--shadow);flex-shrink:0}
-  .logo{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .logo-icon{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow);flex-shrink:0}
-  h1{font-size:1.4rem;color:var(--blue);font-weight:800;letter-spacing:-.5px}
-  .tagline{color:#333;font-size:.88rem;margin-bottom:10px}
-  .chip-groups{display:flex;gap:12px;flex-wrap:wrap}
-  .chip-group{flex:1;min-width:140px}
-  .chip-group h4{font-size:.8rem;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-  .chip-group.info h4{color:var(--green)}
-  .chip-group.study h4{color:var(--blue)}
-  .chip{display:block;padding:4px 10px;border-radius:8px;font-size:.85rem;margin-bottom:3px;background:#f5f5e9;color:#333;cursor:pointer;transition:.15s}
-  .chip:hover{opacity:.75}
-  .prompt-label{font-size:.82rem;color:var(--gray);margin-bottom:6px}
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      background-image:
+        radial-gradient(ellipse at 0% 0%, rgba(66,165,245,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 100% 100%, rgba(102,187,106,0.15) 0%, transparent 55%);
+    }
 
-  /* MESSAGES */
-  #messages{flex:1;overflow-y:auto;background:var(--white);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
-  .msg{max-width:85%;padding:10px 14px;border-radius:var(--radius);line-height:1.5;font-size:.92rem}
-  .msg.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
-  .msg.bot{align-self:flex-start;background:var(--blue-pale);color:#1a1a1a;border-bottom-left-radius:4px;border-left:4px solid var(--blue-light)}
-  .msg.bot.thinking{opacity:.7;font-style:italic}
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 8px 48px var(--shadow), 0 1px 3px rgba(0,0,0,0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 92vh;
+      border: 1.5px solid var(--border);
+    }
 
-  /* INPUT */
-  .chat-input-row{display:flex;gap:8px;padding:10px 14px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);flex-shrink:0}
-  #user-input{flex:1;padding:10px 14px;border:2px solid var(--blue-light);border-radius:24px;font-size:.95rem;outline:none;transition:.2s}
-  #user-input:focus{border-color:var(--blue)}
-  #send-btn{background:var(--blue);color:#fff;border:none;border-radius:24px;padding:10px 22px;font-weight:700;cursor:pointer;font-size:.95rem;transition:.2s;white-space:nowrap}
-  #send-btn:hover{background:var(--blue-light)}
-  #send-btn:disabled{opacity:.5;cursor:not-allowed}
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #0D47A1 0%, #1565C0 45%, #2E7D32 100%);
+      padding: 18px 24px 16px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      position: relative; z-index: 1;
+    }
+    .header-icon {
+      width: 42px; height: 42px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      backdrop-filter: blur(4px);
+      border: 1.5px solid rgba(255,255,255,0.3);
+    }
+    .header-title {
+      font-family: 'Lora', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .header-subtitle {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 1px;
+      letter-spacing: 0.03em;
+    }
+    .header-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 4px 11px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(4px);
+    }
+    .header-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.5;
+      position: relative; z-index: 1;
+      max-width: 700px;
+    }
 
-  /* MATH TOOLBAR */
-  .math-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:#f0f4ff;border-radius:var(--radius);border:1px solid #c5d5f5;flex-shrink:0}
-  .math-toolbar-label{font-size:.75rem;color:var(--gray);font-weight:600;white-space:nowrap;margin-right:2px}
-  .sym-btn{background:#fff;border:1px solid #b0c4de;border-radius:6px;padding:4px 8px;font-size:.9rem;cursor:pointer;line-height:1.3;transition:.15s;color:#1a1a1a;font-family:'Segoe UI',system-ui,sans-serif}
-  .sym-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
-  .sym-divider{width:1px;height:20px;background:#ccc;margin:0 2px;flex-shrink:0}
-  .tips-toggle{margin-left:auto;font-size:.78rem;color:var(--blue);background:none;border:none;cursor:pointer;white-space:nowrap;font-weight:600;padding:2px 6px;border-radius:6px;transition:.15s}
-  .tips-toggle:hover{background:#ddeeff}
-  .tips-panel{background:#fffbe6;border:1px solid #ffe082;border-radius:var(--radius);padding:10px 14px;font-size:.83rem;color:#4a3900;flex-shrink:0;display:none}
-  .tips-panel.open{display:block}
-  .tips-panel h4{font-size:.82rem;font-weight:700;margin-bottom:6px;color:#7a5800}
-  .tips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 20px}
-  .tips-grid code{background:#fff3c4;padding:1px 5px;border-radius:4px;font-size:.82rem}
+    /* ── Footer ── */
+    .app-footer {
+      background: linear-gradient(135deg, #0D47A1 0%, #1565C0 45%, #2E7D32 100%);
+      padding: 7px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .footer-link {
+      font-family: 'Nunito', sans-serif;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: color 0.15s;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .footer-link:hover { color: #fff; text-decoration: underline; }
 
-  @media(max-width:500px){h1{font-size:1.1rem}.msg{max-width:95%}.tips-grid{grid-template-columns:1fr}}
-</style>
+    /* ── Two-column body ── */
+    .body-cols { display: flex; flex: 1; min-height: 0; }
+
+    /* ── Left column ── */
+    .left-col {
+      width: 380px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1.5px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    /* Quick actions */
+    .quick-panel {
+      padding: 14px 16px;
+      background: #f8fbff;
+      border-bottom: 1.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .quick-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .quick-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+    .quick-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .quick-btn.info {
+      background: var(--blue-bg);
+      color: var(--blue);
+      border-color: #90CAF9;
+    }
+    .quick-btn.info:hover {
+      background: #BBDEFB;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(21,101,192,0.15);
+    }
+    .quick-btn.study {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: #A5D6A7;
+    }
+    .quick-btn.study:hover {
+      background: #C8E6C9;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(46,125,50,0.15);
+    }
+    .quick-btn .btn-icon { font-size: 13px; }
+
+    /* Chat history */
+    .chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--white);
+    }
+    .chat-history::-webkit-scrollbar { width: 4px; }
+    .chat-history::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .user-msg {
+      padding: 10px 13px;
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+      color: #fff;
+      border-radius: 14px 14px 4px 14px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      align-self: flex-end;
+      max-width: 92%;
+      box-shadow: 0 2px 8px rgba(21,101,192,0.2);
+      cursor: pointer;
+      transition: box-shadow 0.15s;
+      word-break: break-word;
+    }
+    .user-msg:hover { box-shadow: 0 3px 12px rgba(21,101,192,0.35); }
+    .user-msg.active { outline: 2px solid var(--green-lt); outline-offset: 2px; }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text-soft);
+    }
+    .empty-icon { font-size: 30px; opacity: 0.4; }
+    .empty-text { font-size: 13px; opacity: 0.6; text-align: center; padding: 0 20px; }
+
+    /* Math toolbar */
+    .math-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      padding: 6px 14px;
+      background: #f0f6ff;
+      border-top: 1.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .math-toolbar-label {
+      font-size: .72rem;
+      color: var(--text-soft);
+      font-weight: 700;
+      white-space: nowrap;
+      margin-right: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .sym-btn {
+      background: var(--white);
+      border: 1px solid #90CAF9;
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: .85rem;
+      cursor: pointer;
+      line-height: 1.3;
+      transition: .15s;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+    }
+    .sym-btn:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .sym-divider { width: 1px; height: 18px; background: #90CAF9; margin: 0 2px; flex-shrink: 0; }
+    .tips-toggle {
+      margin-left: auto;
+      font-size: .75rem;
+      color: var(--blue);
+      background: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: .15s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .tips-toggle:hover { background: #BBDEFB; }
+
+    /* Notation tips panel */
+    .tips-panel {
+      background: #fffbe6;
+      border-top: 1px solid #ffe082;
+      padding: 8px 14px;
+      font-size: .8rem;
+      color: #4a3900;
+      flex-shrink: 0;
+      display: none;
+    }
+    .tips-panel.open { display: block; }
+    .tips-panel h4 { font-size: .79rem; font-weight: 700; margin-bottom: 5px; color: #7a5800; }
+    .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 3px 16px; }
+    .tips-grid code { background: #fff3c4; padding: 1px 4px; border-radius: 4px; font-size: .79rem; }
+
+    /* Input bar */
+    .input-bar {
+      padding: 10px 14px 14px;
+      border-top: 1.5px solid var(--border);
+      background: #f8fbff;
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 7px 12px;
+      transition: border-color 0.2s;
+    }
+    .input-row:focus-within {
+      border-color: var(--blue-lt);
+      box-shadow: 0 0 0 3px rgba(21,101,192,0.08);
+    }
+    #chat-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13.5px;
+      color: var(--text);
+      background: none;
+      resize: none;
+      line-height: 1.5;
+      padding: 3px 0;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    #chat-input::placeholder { color: #90CAF9; }
+    .send-btn {
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      color: #fff;
+      display: flex; align-items: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      box-shadow: 0 2px 8px rgba(21,101,192,0.3);
+    }
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(21,101,192,0.35);
+    }
+    .send-btn:disabled {
+      background: #BBDEFB;
+      color: #90CAF9;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .input-footer {
+      text-align: center;
+      font-size: 10.5px;
+      color: #90CAF9;
+      margin-top: 6px;
+    }
+
+    /* ── Right column (response) ── */
+    .right-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .response-header {
+      padding: 12px 20px;
+      background: #f8fbff;
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .response-header-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    .response-header-dot.loading { animation: pulse 1.2s ease infinite; }
+    .response-header-dot.error { background: var(--amber); }
+    .response-header-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+    .response-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--text);
+    }
+    .response-area::-webkit-scrollbar { width: 5px; }
+    .response-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .response-empty {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text-soft);
+      opacity: 0.5;
+    }
+    .response-empty-icon { font-size: 36px; }
+    .response-empty-text { font-size: 13px; }
+
+    /* Markdown in response */
+    .response-area strong { font-weight: 700; color: var(--text-mid); }
+    .response-area em { font-style: italic; }
+    .response-area p { margin-bottom: 12px; }
+    .response-area p:last-child { margin-bottom: 0; }
+    .response-area ul, .response-area ol { margin: 8px 0 12px 20px; }
+    .response-area li { margin-bottom: 4px; }
+    .response-area code {
+      background: var(--blue-bg);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    /* Error notice */
+    .error-notice {
+      background: var(--amber-bg);
+      border: 1.5px solid var(--amber-lt);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .error-notice-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .error-notice-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
+
+    /* Typing dots */
+    .typing-dots { display: flex; gap: 5px; align-items: center; padding: 8px 0; }
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--blue-lt);
+      animation: bounce 1.1s ease infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.18s; }
+    .dot:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── Privacy Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13,27,42,0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-card {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 12px 48px rgba(21,101,192,0.2), 0 2px 8px rgba(0,0,0,0.08);
+      max-width: 520px;
+      width: 100%;
+      overflow: hidden;
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #0D47A1 0%, #1565C0 45%, #2E7D32 100%);
+      padding: 16px 22px;
+    }
+    .modal-header h2 {
+      font-family: 'Lora', serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      margin: 0;
+    }
+    .modal-body {
+      padding: 20px 22px 6px;
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+    .modal-body h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-mid);
+      margin: 16px 0 6px;
+    }
+    .modal-body h3:first-child { margin-top: 0; }
+    .modal-body p { font-size: 13px; line-height: 1.6; color: var(--text); margin-bottom: 8px; }
+    .modal-body a { color: var(--blue); text-decoration: none; }
+    .modal-body a:hover { text-decoration: underline; }
+    .modal-footer {
+      padding: 14px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-footer .acknowledge-text { font-size: 11.5px; color: var(--text-soft); text-align: center; }
+    .modal-accept-btn {
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 8px rgba(21,101,192,0.3);
+    }
+    .modal-accept-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(21,101,192,0.35);
+    }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      .body-cols { flex-direction: column; }
+      .left-col { width: 100%; min-width: unset; border-right: none; border-bottom: 1.5px solid var(--border); max-height: 50vh; }
+      .right-col { min-height: 35vh; }
+      .header-badge { display: none; }
+      .tips-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<div id="app">
 
-  <header>
-    <div class="logo">
-      <div class="logo-icon">📐</div>
-      <h1>Algebra Assistant</h1>
+<!-- Privacy Modal -->
+<div class="modal-overlay" id="privacy-modal">
+  <div class="modal-card">
+    <div class="modal-header"><h2>About this tool</h2></div>
+    <div class="modal-body">
+      <p>This is an experimental study assistant built by Doug Ward at the Center for Teaching Excellence. It is not an official KU tool and has not been reviewed by KU IT. Use is optional.</p>
+
+      <h3>What happens to what you type</h3>
+      <p>Your messages are sent to Anthropic (the company that makes Claude) for processing. Anthropic stores API inputs and outputs for seven days and does not use them to train AI models. Your messages also pass through a Cloudflare server maintained by the course developer; it logs only basic technical information (a hashed, anonymized identifier and request count), not message content.</p>
+
+      <h3>What not to share</h3>
+      <p>Please do not enter your name, KUID, grades, draft assignments you plan to submit for a grade, or anything about your academic standing or personal situation. Keep questions focused on course concepts and logistics.</p>
+
+      <p>Questions or concerns? Contact Doug Ward at <a href="mailto:dbward@ku.edu">dbward@ku.edu</a>.</p>
     </div>
-    <p class="tagline">I'm your College Algebra study companion. I can help you think through algebra concepts, find due dates, and understand course policies. I won't give you answers, but I will help you find them!</p>
-    <p class="prompt-label">Try asking me about:</p>
-    <div class="chip-groups">
-      <div class="chip-group info">
-        <h4>📋 Course Information</h4>
-        <span class="chip" onclick="fillInput('When is [assignment name] due?')">📅 Due dates</span>
-        <span class="chip" onclick="fillInput('What is the policy for late assignments?')">📄 Course policies</span>
-      </div>
-      <div class="chip-group study">
-        <h4>📚 Study Assistance</h4>
-        <span class="chip" onclick="fillInput('Can you help me understand [concept] from the textbook?')">📖 Textbook concepts</span>
-        <span class="chip" onclick="fillInput('Can you create a study guide for [topic]?')">🧠 Study guides</span>
-        <span class="chip" onclick="fillInput('Can you give me practice problems for [topic]?')">🧪 Practice problems</span>
-        <span class="chip" onclick="fillInput('How should I approach [topic or problem type]?')">❓ How to approach a topic</span>
-      </div>
+    <div class="modal-footer">
+      <p class="acknowledge-text">By continuing, you acknowledge you've read this notice.</p>
+      <button class="modal-accept-btn" onclick="acceptPrivacy()">I understand. Continue</button>
     </div>
-  </header>
-
-  <div id="messages"></div>
-
-  <!-- Math Symbol Toolbar -->
-  <div class="math-toolbar">
-    <span class="math-toolbar-label">Insert:</span>
-    <button class="sym-btn" onclick="insertSym('^')" title="Exponent (e.g. x^2)">^ exp</button>
-    <button class="sym-btn" onclick="insertSym('²')" title="Superscript 2">x²</button>
-    <button class="sym-btn" onclick="insertSym('³')" title="Superscript 3">x³</button>
-    <button class="sym-btn" onclick="insertSym('√')" title="Square root">√</button>
-    <button class="sym-btn" onclick="insertSym('/')" title="Division / fraction">/</button>
-    <button class="sym-btn" onclick="insertSym('×')" title="Multiply">×</button>
-    <button class="sym-btn" onclick="insertSym('÷')" title="Divide">÷</button>
-    <div class="sym-divider"></div>
-    <button class="sym-btn" onclick="insertSym('≤')" title="Less than or equal">≤</button>
-    <button class="sym-btn" onclick="insertSym('≥')" title="Greater than or equal">≥</button>
-    <button class="sym-btn" onclick="insertSym('≠')" title="Not equal">≠</button>
-    <button class="sym-btn" onclick="insertSym('±')" title="Plus or minus">±</button>
-    <div class="sym-divider"></div>
-    <button class="sym-btn" onclick="insertSym('π')" title="Pi">π</button>
-    <button class="sym-btn" onclick="insertSym('∞')" title="Infinity">∞</button>
-    <button class="sym-btn" onclick="insertSym('log(')" title="Logarithm">log(</button>
-    <button class="sym-btn" onclick="insertSym('ln(')" title="Natural log">ln(</button>
-    <button class="sym-btn" onclick="insertSym('f(x)=')" title="Function notation">f(x)=</button>
-    <button class="tips-toggle" onclick="toggleTips()" id="tips-btn">💡 Notation tips ▾</button>
   </div>
+</div>
 
-  <!-- Notation Tips Panel -->
-  <div class="tips-panel" id="tips-panel">
-    <h4>📝 How to type math in this chat</h4>
-    <div class="tips-grid">
-      <div>Exponents: <code>x^2</code> means x²</div>
-      <div>Fractions: <code>3/4</code> means ¾</div>
-      <div>Square root: <code>sqrt(x)</code> or <code>√x</code></div>
-      <div>Nth root: <code>x^(1/n)</code></div>
-      <div>Subscript: <code>log_b(x)</code> means log base b</div>
-      <div>Multiplication: <code>2*x</code> or <code>2x</code></div>
-      <div>Absolute value: <code>|x|</code></div>
-      <div>Infinity: <code>∞</code> or just type "infinity"</div>
-      <div>Negative exponent: <code>x^(-1)</code></div>
-      <div>Grouping: use parentheses <code>(a+b)/(c+d)</code></div>
-      <div>f inverse: <code>f^(-1)(x)</code></div>
-      <div>Scientific notation: <code>3.2 * 10^5</code></div>
+<!-- App -->
+<div class="app-shell">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-icon">📐</div>
+      <div>
+        <div class="header-title">Math 101 Algebra Assistant</div>
+        <div class="header-subtitle">College Algebra · Online · University of Kansas · Dr. Alex Schaefer</div>
+      </div>
+      <div class="header-badge">PEER TUTOR MODE</div>
+    </div>
+    <div class="header-desc">
+      Hey! I'm your College Algebra study buddy. Ask me about due dates, course policies, or any concept you're working through. I won't just give you answers — but I'll help you figure them out.
     </div>
   </div>
 
-  <div class="chat-input-row">
-    <input id="user-input" type="text" placeholder="Ask me anything about the course..." maxlength="1000"/>
-    <button id="send-btn" onclick="sendMessage()">Send</button>
+  <!-- Two-column body -->
+  <div class="body-cols">
+
+    <!-- LEFT: quick actions + chat history + math toolbar + input -->
+    <div class="left-col">
+
+      <!-- Quick actions -->
+      <div class="quick-panel">
+        <div class="quick-label">Try asking about:</div>
+        <div class="quick-grid">
+          <button class="quick-btn info" onclick="quickAsk('When is my next assignment due?')">
+            <span class="btn-icon">📅</span> Due dates
+          </button>
+          <button class="quick-btn info" onclick="quickAsk('What are the course policies?')">
+            <span class="btn-icon">📄</span> Policies
+          </button>
+          <button class="quick-btn study" onclick="quickAsk('Can you help me understand functions?')">
+            <span class="btn-icon">💡</span> Explain a concept
+          </button>
+          <button class="quick-btn study" onclick="quickAsk('Can you give me practice problems on quadratic equations?')">
+            <span class="btn-icon">✏️</span> Practice problems
+          </button>
+          <button class="quick-btn study" onclick="quickAsk('Can you make me a study guide for exponential functions?')">
+            <span class="btn-icon">🧠</span> Study guide
+          </button>
+          <button class="quick-btn study" onclick="quickAsk('How should I approach factoring?')">
+            <span class="btn-icon">🧩</span> How to approach a topic
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat history -->
+      <div class="chat-history" id="chat-history">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">💬</div>
+          <div class="empty-text">Your questions will appear here. Tap any to re-read the response.</div>
+        </div>
+      </div>
+
+      <!-- Math toolbar -->
+      <div class="math-toolbar">
+        <span class="math-toolbar-label">Insert:</span>
+        <button class="sym-btn" onclick="insertSym('^')" title="Exponent">^ exp</button>
+        <button class="sym-btn" onclick="insertSym('²')" title="Squared">x²</button>
+        <button class="sym-btn" onclick="insertSym('³')" title="Cubed">x³</button>
+        <button class="sym-btn" onclick="insertSym('√')" title="Square root">√</button>
+        <button class="sym-btn" onclick="insertSym('/')" title="Fraction">/</button>
+        <button class="sym-btn" onclick="insertSym('×')" title="Multiply">×</button>
+        <button class="sym-btn" onclick="insertSym('÷')" title="Divide">÷</button>
+        <div class="sym-divider"></div>
+        <button class="sym-btn" onclick="insertSym('≤')" title="Less than or equal">≤</button>
+        <button class="sym-btn" onclick="insertSym('≥')" title="Greater than or equal">≥</button>
+        <button class="sym-btn" onclick="insertSym('≠')" title="Not equal">≠</button>
+        <button class="sym-btn" onclick="insertSym('±')" title="Plus or minus">±</button>
+        <div class="sym-divider"></div>
+        <button class="sym-btn" onclick="insertSym('π')" title="Pi">π</button>
+        <button class="sym-btn" onclick="insertSym('∞')" title="Infinity">∞</button>
+        <button class="sym-btn" onclick="insertSym('log(')" title="Logarithm">log(</button>
+        <button class="sym-btn" onclick="insertSym('ln(')" title="Natural log">ln(</button>
+        <button class="sym-btn" onclick="insertSym('f(x)=')" title="Function notation">f(x)=</button>
+        <button class="tips-toggle" onclick="toggleTips()" id="tips-btn">💡 Notation tips ▾</button>
+      </div>
+
+      <!-- Notation tips panel -->
+      <div class="tips-panel" id="tips-panel">
+        <h4>📝 How to type math in this chat</h4>
+        <div class="tips-grid">
+          <div>Exponents: <code>x^2</code> means x²</div>
+          <div>Fractions: <code>3/4</code> means ¾</div>
+          <div>Square root: <code>sqrt(x)</code> or <code>√x</code></div>
+          <div>Nth root: <code>x^(1/n)</code></div>
+          <div>Log base b: <code>log_b(x)</code></div>
+          <div>Multiply: <code>2*x</code> or <code>2x</code></div>
+          <div>Absolute value: <code>|x|</code></div>
+          <div>Grouping: <code>(a+b)/(c+d)</code></div>
+          <div>Negative exp: <code>x^(-1)</code></div>
+          <div>f inverse: <code>f^(-1)(x)</code></div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-bar">
+        <div class="input-row">
+          <textarea id="chat-input" rows="1" placeholder="Ask anything about the course…"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22,2 15,22 11,13 2,9"/>
+            </svg>
+          </button>
+        </div>
+        <div class="input-footer">
+          Guides your thinking · gives direct answers for logistics &amp; definitions
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: response panel -->
+    <div class="right-col">
+      <div class="response-header">
+        <div class="response-header-dot" id="status-dot"></div>
+        <div class="response-header-label" id="status-label">Ready</div>
+      </div>
+      <div class="response-area" id="response-area">
+        <div class="response-empty">
+          <div class="response-empty-icon">📐</div>
+          <div class="response-empty-text">Responses will appear here</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="app-footer">
+    <button class="footer-link" onclick="showPrivacyModal()">Privacy notice</button>
   </div>
 
 </div>
 
 <script>
-const SYLLABUS = `Math 101 ONLINE – College Algebra | Section #14871, Fall 2025
-Instructor: Dr. Alex Schaefer (Alex) | Email: alex.scha4@ku.edu
+const WORKER_URL = "https://algebra-app.dbward2119.workers.dev";
 
-COURSE DESCRIPTION: 3 credit-hour course fulfilling KU mathematics requirement. Covers algebraic principles, equations and inequalities (analytic and graphical), and functions through multiple representations. Units: (1) Functions—Language & Tools, (2) Linear & Quadratic Functions, (3) Polynomial & Rational Functions, (4) Exponential & Logarithmic Functions, (5) Linear & Non-linear Systems.
+let conversationHistory = [];
+let responseHistory = [];
+let isLoading = false;
 
-INSTRUCTIONAL APPROACH: Canvas for syllabus, videos, written HW, grades, and WebAssign access. WebAssign for online HW. Access WebAssign ONLY through Canvas.
+// ── Privacy modal ──
+function acceptPrivacy() {
+  try { localStorage.setItem("math101_privacy_accepted", "1"); } catch(e) {}
+  document.getElementById("privacy-modal").classList.add("hidden");
+}
 
-ASSIGNMENTS:
-- Written Assignments (5 pts each, 26 total): Complete on paper, scan, submit to Canvas. Due at end of unit but do them as you go. Graded on work/completion. NO late accepted.
-- WebAssign Assignments (10 pts each, 20 total): Late accepted with extension. Request extension in WA within 1 week of due date; then 1 more week to finish. Penalty: 20% on unsubmitted problems. Max 20 submissions per assignment—don't submit after every problem.
-- Exams: 2 Midterms + 1 cumulative Final. In-person, proctored, at approved testing center. Closed book/notes/internet. TI-83 or TI-84 calculator required.
+function showPrivacyModal() {
+  document.getElementById("privacy-modal").classList.remove("hidden");
+}
 
-GRADING: WA (200 pts) + Written HW (130 pts) + Midterm 1 (150) + Midterm 2 (150) + Final (200) = 830 pts total, graded out of 780.
-Scale: A=90–100%, B=80–90%, C=70–80%, D=60–70%, F=below 60%
+(function checkPrivacy() {
+  try {
+    if (localStorage.getItem("math101_privacy_accepted") === "1") {
+      document.getElementById("privacy-modal").classList.add("hidden");
+    }
+  } catch(e) {
+    // localStorage unavailable (e.g., iframe sandbox) — show modal every time
+  }
+})();
 
-REQUIRED MATERIALS: Reliable computer/internet; TI-83 or TI-84 calculator; Math 101 Guided Notes & Practice 2025–2026 (~$30, KU Bookstore); WebAssign access (buy via Canvas); Optional: OpenStax College Algebra 2e (free).
-
-HELP: Help Room, 323 Strong Hall, M–R 9AM–6PM, F 9AM–4PM (free drop-in). Email instructor; office 323C Strong Hall; Zoom available. SAC for accommodations: Strong 22, 785-864-4064, access.ku.edu.
-
-ACADEMIC INTEGRITY: Unauthorized aid, plagiarism, cheating carry very serious penalties per University Senate Rules Section 6.`;
-
-const SCHEDULE = `COURSE SCHEDULE – Fall 2025 (most due dates MWF)
-
-UNIT 1: Functions – Language & Tools
-WA0 (10pts) Due Fri 8/22 | WA1 (10pts) Due Fri 8/22 | WA2 (10pts) Due Wed 8/27 | WA3 (10pts) Due Fri 8/29 | WA4 (10pts) Due Wed 9/03
-Written HW 1-1, 1-2, 1-3, 1-4, 1-5 (5pts each) ALL due Fri 9/05 — NO late accepted
-
-UNIT 2: Linear & Quadratic Functions
-WA5 (10pts) Due Wed 9/10 | WA6 (10pts) Due Fri 9/12 | WA7 (10pts) Due Wed 9/17 | WA8 (10pts) Due Fri 9/19 | WA9 (10pts) Due Mon 9/22
-Written HW 2-1, 2-2, 2-3, 2-4, 2-5 (5pts each) ALL due Wed 9/24 — NO late accepted
-*** MIDTERM 1 EXAM (Units 1–2): Thu 9/25 or Fri 9/26 — in-person, proctored ***
-
-UNIT 3: Polynomial & Rational Functions
-WA10 (10pts) Due Wed 10/01 | WA11 (10pts) Due Wed 10/08 | WA12 (10pts) Due Wed 10/15 | WA13 (10pts) Due Wed 10/22
-Written HW 3-1, 3-2, 3-3, 3-4, 3-5, 3-6 (5pts each) ALL due Fri 10/24 — NO late accepted
-
-UNIT 4: Exponential & Logarithmic Functions
-WA14 (10pts) Due Wed 10/29 | WA15 (10pts) Due Fri 10/31 | WA16 (10pts) Due Wed 11/05 | WA17 (10pts) Due Mon 11/10
-Written HW 4-1, 4-2, 4-3, 4-4, 4-5, 4-6 (5pts each) ALL due Wed 11/12 — NO late accepted
-*** MIDTERM 2 EXAM (Units 3–4): Thu 11/13 or Fri 11/14 — in-person, proctored ***
-
-UNIT 5: Linear & Nonlinear Systems
-WA18 (10pts) Due Fri 11/21 | WA19 (10pts) Due Mon 12/01
-Written HW 5-1, 5-2, 5-3, 5-4 (5pts each) ALL due Thu 12/04 — NO late accepted
-*** CUMULATIVE FINAL EXAM: Wed 12/10 — in-person, proctored ***`;
-
-const TEXTBOOK = `TEXTBOOK REFERENCE: OpenStax College Algebra 2e — Condensed Chapter Summaries
-
-== CHAPTER 1: PREREQUISITES ==
-1.1 Real Numbers: Natural numbers (counting), Whole (natural+0), Integers (whole+negatives), Rational (fractions p/q, expressed as terminating or repeating decimals), Irrational (non-repeating, non-terminating; e.g. sqrt(2), pi), Real (rational+irrational). Order of Operations: PEMDAS. Properties: Commutative (a+b=b+a; ab=ba), Associative ((a+b)+c=a+(b+c)), Distributive (a(b+c)=ab+ac), Identity (a+0=a; a*1=a), Inverse (a+(-a)=0; a*(1/a)=1). Evaluating algebraic expressions: substitute values for variables and simplify.
-1.2 Exponents: Product rule: a^m*a^n=a^(m+n). Quotient rule: a^m/a^n=a^(m-n). Power rule: (a^m)^n=a^(mn). Zero exponent: a^0=1. Negative exponent: a^(-n)=1/a^n. Power of product: (ab)^n=a^n*b^n. Power of quotient: (a/b)^n=a^n/b^n. Scientific notation: c×10^n where 1≤c<10.
-1.3 Radicals & Rational Exponents: Principal square root is nonnegative. Product rule: sqrt(ab)=sqrt(a)*sqrt(b). Quotient rule: sqrt(a/b)=sqrt(a)/sqrt(b). Add/subtract radicals only with same radicand. Rationalize denominators by multiplying by conjugate. Rational exponents: a^(m/n) = (nth-root of a)^m.
-1.4 Polynomials: Degree = highest exponent. Monomial/binomial/trinomial. Add/subtract by combining like terms. Multiply using distributive property or FOIL. Perfect square: (a±b)^2=a^2±2ab+b^2. Difference of squares: (a+b)(a-b)=a^2-b^2.
-1.5 Factoring: Always check GCF first. Trinomial (leading coeff=1): find two numbers with product=c, sum=b. Factoring by grouping for leading coeff≠1. Perfect square trinomials. Difference of squares: a^2-b^2=(a+b)(a-b). Sum of cubes: a^3+b^3=(a+b)(a^2-ab+b^2). Difference of cubes: a^3-b^3=(a-b)(a^2+ab+b^2).
-1.6 Rational Expressions: Simplify by factoring and canceling common factors. Multiply: factor, multiply, simplify. Divide: multiply by reciprocal. Add/subtract: find LCD, rewrite, combine numerators. Complex rational expressions: simplify numerator and denominator separately, then divide.
-
-== CHAPTER 2: EQUATIONS AND INEQUALITIES ==
-2.1 Coordinate Systems & Graphs: Cartesian plane: x-axis (horizontal), y-axis (vertical), origin (0,0), four quadrants. Ordered pairs (x,y). x-intercept: set y=0. y-intercept: set x=0. Distance formula: d=sqrt((x2-x1)^2+(y2-y1)^2). Midpoint formula: ((x1+x2)/2,(y1+y2)/2).
-2.2 Linear Equations: ax+b=0. Types: identity (all reals), conditional (one solution), inconsistent (no solution). Rational equations: multiply by LCD, check excluded values. Slope: m=(y2-y1)/(x2-x1). Slope-intercept: y=mx+b. Point-slope: y-y1=m(x-x1). Standard form: ax+by=c. Vertical: x=c (undefined slope). Horizontal: y=c (slope=0). Parallel lines: equal slopes. Perpendicular: slopes are negative reciprocals (m1*m2=-1).
-2.3 Models & Applications: Translate word problems to linear equations. Key formulas: d=rt, P=2l+2w, A=lw, V=lwh.
-2.4 Complex Numbers: i=sqrt(-1), i^2=-1. Standard form: a+bi. Add/subtract: combine real and imaginary parts. Multiply: FOIL, replace i^2 with -1. Divide: multiply by complex conjugate (a-bi). Powers of i cycle with period 4: i,−1,−i,1.
-2.5 Quadratic Equations: ax^2+bx+c=0. Methods: (1) Factoring + zero-product property, (2) Square root property, (3) Completing the square, (4) Quadratic formula: x=(-b±sqrt(b^2-4ac))/(2a). Discriminant b^2-4ac: >0 two real solutions, =0 one real solution, <0 two complex solutions. Pythagorean theorem: a^2+b^2=c^2.
-2.6 Other Equations: Rational exponents: raise both sides to reciprocal power. Polynomial equations: factor using GCF, grouping, special forms. Radical equations: isolate radical, raise to nth power, check for extraneous solutions. Absolute value: |X|=a means X=a or X=-a. Quadratic form: substitute u for middle-term variable, solve as quadratic.
-2.7 Inequalities: Interval notation uses parentheses (strict) and brackets (inclusive); infinity always uses parentheses. Multiplying/dividing by negative reverses inequality. Compound inequalities: solve both parts. Absolute value inequalities: |X|<a means -a<X<a; |X|>a means X<-a or X>a.
-
-== CHAPTER 3: FUNCTIONS (Unit 1) ==
-3.1 Functions & Notation: A function assigns exactly one output to each input. Vertical line test for graphs. Function notation: f(x). Domain: all valid inputs. Range: all possible outputs. Piecewise functions: different rules for different parts of domain.
-3.2 Domain & Range: Domain restrictions: denominators≠0, radicands of even roots≥0. Express in interval notation. Range found by analyzing graph or algebraically. For f(x)=sqrt(x-a): domain is [a,∞).
-3.3 Rates of Change & Graph Behavior: Average rate of change = (f(b)-f(a))/(b-a) = slope of secant line. Increasing: rises left to right. Decreasing: falls left to right. Local maximum/minimum: turning points. Absolute (global) max/min.
-3.4 Composition of Functions: (f∘g)(x)=f(g(x)). Apply inner function first, then outer. Domain of composition: inputs valid in g whose outputs are valid in f.
-3.5 Transformations: Vertical shift: f(x)+k (up k). Horizontal shift: f(x-h) (right h). Vertical stretch/compression: a*f(x). Horizontal stretch/compression: f(bx). Reflection over x-axis: -f(x). Reflection over y-axis: f(-x). Order matters when combining transformations.
-3.6 Absolute Value Functions: f(x)=|x|, V-shaped graph, vertex at origin. f(x)=a|x-h|+k: vertex at (h,k), opens up if a>0, down if a<0. |a|>1 narrows; 0<|a|<1 widens.
-3.7 Inverse Functions: f⁻¹ reverses f. Horizontal line test: one-to-one functions have inverses. To find inverse: swap x and y, solve for y. f(f⁻¹(x))=x and f⁻¹(f(x))=x. Graphs of f and f⁻¹ are reflections over y=x.
-
-== CHAPTER 4: LINEAR FUNCTIONS (Unit 2) ==
-4.1 Linear Functions: f(x)=mx+b. Constant rate of change = slope m. y-intercept = b. Graph is a straight line. Increasing if m>0, decreasing if m<0, constant if m=0. Slope = (change in y)/(change in x). x-intercept: set f(x)=0.
-4.2 Modeling with Linear Functions: Identify slope as rate of change with units. Identify y-intercept as initial value. Write equation from two points or from slope and one point. Interpret slope and intercept in context of real-world problems.
-4.3 Fitting Linear Models to Data: Scatter plots show relationship between two variables. Line of best fit (linear regression) minimizes distance from data points. Correlation coefficient r: close to 1 or -1 means strong linear relationship; close to 0 means weak. Interpolation (within data range) vs. extrapolation (outside data range; less reliable).
-
-== CHAPTER 5: POLYNOMIAL & RATIONAL FUNCTIONS (Unit 3) ==
-5.1 Quadratic Functions: f(x)=ax^2+bx+c or vertex form f(x)=a(x-h)^2+k. Parabola: opens up if a>0, down if a<0. Vertex: (h,k) or x=-b/(2a). Axis of symmetry: x=h. y-intercept: f(0). x-intercepts: solve f(x)=0. Domain: all reals. Range: [k,∞) if a>0; (-∞,k] if a<0.
-5.2 Power & Polynomial Functions: Power function: f(x)=kx^n. Even degree: both ends same direction. Odd degree: ends go opposite directions. Leading coefficient determines end behavior. Degree n polynomial has at most n real zeros and n-1 turning points.
-5.3 Graphs of Polynomials: Zeros/x-intercepts found by factoring or quadratic formula. Multiplicity of a zero: if even, graph touches and bounces; if odd, graph crosses. End behavior determined by leading term. Intermediate Value Theorem: if f(a) and f(b) have opposite signs, there is a zero between a and b.
-5.4 Dividing Polynomials: Long division: dividend = divisor × quotient + remainder. Synthetic division: shortcut when dividing by (x-c). Remainder theorem: f(c) = remainder when divided by (x-c). Factor theorem: (x-c) is a factor iff f(c)=0.
-5.5 Zeros of Polynomials: Rational Zero Theorem: possible rational zeros are ±(factors of constant)/(factors of leading coefficient). Fundamental Theorem of Algebra: degree-n polynomial has exactly n zeros (counting complex and repeated). Complex zeros come in conjugate pairs. Descartes' Rule of Signs estimates number of positive/negative real zeros.
-5.6 Rational Functions: f(x)=p(x)/q(x). Domain: q(x)≠0. Vertical asymptotes: where denominator=0 (after canceling common factors). Horizontal asymptotes: compare degrees of numerator and denominator (if deg num < deg denom: y=0; if equal: y=leading coefficients ratio; if num > denom: no HA, possible oblique asymptote). Holes: where common factors cancel. x-intercepts: where numerator=0.
-5.7 Inverses & Radical Functions: Inverse of f(x)=x^n is f⁻¹(x)=x^(1/n). Radical functions are inverses of power functions. Domain restrictions required for even roots. To find inverse: swap x and y, solve for y.
-5.8 Variation: Direct variation: y=kx. Inverse variation: y=k/x. Joint variation: y=kxz. Combined variation mixes types. k is the constant of variation; find k from given values.
-
-== CHAPTER 6: EXPONENTIAL & LOGARITHMIC FUNCTIONS (Unit 4) ==
-6.1 Exponential Functions: f(x)=ab^x where b>0, b≠1. If b>1: exponential growth. If 0<b<1: exponential decay. Natural base: e≈2.718. f(x)=ae^(kx): growth if k>0, decay if k<0. y-intercept always at (0,a). Horizontal asymptote: y=0.
-6.2 Graphs of Exponential Functions: f(x)=b^x passes through (0,1) and (1,b). Transformations shift/reflect/stretch the graph. Asymptote shifts with vertical transformations.
-6.3 Logarithmic Functions: log_b(x)=y means b^y=x. Inverse of exponential. Common log: log(x)=log_10(x). Natural log: ln(x)=log_e(x). Domain: x>0. Range: all reals. Key point: (1,0) since log_b(1)=0. Vertical asymptote: x=0.
-6.4 Graphs of Logarithmic Functions: log_b(x) increases if b>1, decreases if 0<b<1. Transformations apply similarly to other functions. log_b(x) and b^x are reflections over y=x.
-6.5 Logarithm Properties: Product rule: log_b(MN)=log_b(M)+log_b(N). Quotient rule: log_b(M/N)=log_b(M)-log_b(N). Power rule: log_b(M^p)=p*log_b(M). Change of base: log_b(M)=log(M)/log(b)=ln(M)/ln(b).
-6.6 Exponential & Log Equations: To solve exponential equations: isolate base, take log of both sides, apply power rule. To solve log equations: use properties to condense to single log, convert to exponential form, solve, check domain. Extraneous solutions possible.
-6.7 Exponential & Log Models: Exponential growth: A=A_0*e^(kt), k>0. Exponential decay: A=A_0*e^(kt), k<0. Half-life: t_(1/2)=ln(2)/k. Doubling time: t=ln(2)/k. Logistic growth: f(x)=c/(1+ae^(-bx)), has carrying capacity c.
-6.8 Fitting Exponential Models: Use two points to find a and b in y=ab^x. Logarithmic regression on calculator. Evaluate fit using residuals.
-
-== CHAPTER 7: SYSTEMS OF EQUATIONS & INEQUALITIES (Unit 5) ==
-7.1 Systems of Linear Equations (2 variables): Solution is the intersection point(s). Methods: graphing, substitution, elimination. Types: consistent independent (one solution), consistent dependent (infinite solutions, same line), inconsistent (no solution, parallel lines).
-7.2 Systems of Linear Equations (3 variables): Three equations, three unknowns. Use elimination to reduce to 2×2 system, then solve. Solutions: one point, no solution, or infinite solutions (plane/line intersections).
-7.3 Nonlinear Systems: At least one equation is nonlinear (quadratic, etc.). Solve by substitution. Can have 0, 1, 2, or more intersection points. Combine with graphing to verify solutions.
-7.4 Partial Fractions: Decompose a rational expression into sum of simpler fractions. Cases: distinct linear factors, repeated linear factors, irreducible quadratic factors. Set up system of equations by matching numerator coefficients.
-7.5 Matrices & Operations: Matrix: rectangular array of numbers. Dimensions: m×n (rows×columns). Add/subtract: same dimensions, add corresponding entries. Scalar multiplication: multiply every entry by scalar. Matrix multiplication: (m×n)(n×p)=(m×p); not commutative.
-7.6 Gaussian Elimination: Augmented matrix represents a system. Row operations: swap rows, multiply row by nonzero scalar, add multiple of one row to another. Goal: row echelon form, then back-substitution. Reduced row echelon form (RREF): identity matrix on left.
-7.7 Solving Systems with Inverses: Square matrix A has inverse A⁻¹ if AA⁻¹=I. System AX=B solved by X=A⁻¹B. Find inverse using row reduction or formula for 2×2: if A=[[a,b],[c,d]], A⁻¹=(1/det)*[[d,-b],[-c,a]] where det=ad-bc.
-7.8 Cramer's Rule: Uses determinants to solve systems. For 2×2: x=Dx/D, y=Dy/D where D=det of coefficient matrix. Works when D≠0. For 3×3: extend to three determinants.`;
-
-const STATE = { history: [] };
-
+// ── Math toolbar ──
 function insertSym(sym) {
-  const inp = document.getElementById('user-input');
+  const inp = document.getElementById('chat-input');
   inp.focus();
   const start = inp.selectionStart;
   const end = inp.selectionEnd;
   inp.value = inp.value.slice(0, start) + sym + inp.value.slice(end);
   inp.selectionStart = inp.selectionEnd = start + sym.length;
+  autoResize(inp);
 }
 
 function toggleTips() {
@@ -270,100 +765,195 @@ function toggleTips() {
   btn.textContent = open ? '💡 Notation tips ▴' : '💡 Notation tips ▾';
 }
 
-function fillInput(prompt) {
-  const inp = document.getElementById('user-input');
-  inp.value = prompt;
-  inp.focus();
-  inp.setSelectionRange(inp.value.length, inp.value.length);
+// ── Input helpers ──
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 100) + "px";
+  updateSendBtn();
 }
 
-function buildSystemPrompt() {
-  return `You are a peer tutor for Math 101 Online – College Algebra, Section #14871, Fall 2025, at the University of Kansas. The instructor is Dr. Alex Schaefer (alex.scha4@ku.edu).
-
-Your Persona: You are a friendly, relatable 17-year-old peer tutor who genuinely enjoys helping classmates figure things out. You remember what it felt like to be confused by math, and you never make anyone feel dumb for not getting it. You talk like a real person — casual, warm, and encouraging — not like a textbook. You use everyday language and real-world analogies that college students can relate to (sports, money, food, social media, gaming, etc.). You keep your responses short and conversational, not lecture-y. You ask one question at a time and celebrate small wins. When something is confusing, you say so — "yeah, this part trips a lot of people up" — so students feel normal for struggling.
-
-Math Anxiety: Many students in this class have avoided math for years and feel anxious or defeated before they even start. Your job is to make math feel less scary. Normalize the struggle. Remind them that confusion is part of learning, not a sign they can't do it. Never use language that could feel judgmental. Keep the vibe low-pressure and supportive.
-
-Tutoring Approach — Guide, Don't Give: You help students figure things out themselves rather than handing them answers. Ask questions that nudge them toward the next step. When a student is stuck, start with what they DO know. Build from there. Use relatable analogies before introducing any math notation. If they make a mistake, ask a question that helps them find it — don't just correct them. Give one small hint at a time and check in before giving more. Example phrases you might use:
-- "Okay so what do you remember about this from class?"
-- "Let's back up — what happens if we start with something simpler?"
-- "Think about it like this — if you had $20 and spent some..."
-- "You're closer than you think. What did you get when you tried step 1?"
-- "Yeah, this concept confused me too at first. Here's the way it finally clicked for me..."
-
-Plain Language First: Always explain concepts in plain English before using any math symbols or formulas. Use concrete, relatable examples. Avoid jargon unless you immediately explain it in simple terms. For example, instead of saying "the domain is the set of all valid inputs," say "the domain is just — what numbers are you even allowed to plug in? Like, you can't divide by zero, so those are off-limits."
-
-You may create: study guides, practice quizzes, step-by-step walkthroughs (of concepts, not assignment answers), and relatable analogies for any topic.
-
-Course Knowledge: You have access to the course syllabus, course schedule, and OpenStax College Algebra 2e textbook summaries (Chapters 1–7). Use these as your reference. When answering questions about due dates, policies, or course logistics, refer specifically to these documents. When helping with content, use the textbook as your reference but do not give direct answers from it.
-
-Course Operations: Give clear, friendly info about due dates, assignment formats, and policies. Reference the syllabus or schedule when relevant. If something isn't in your reference materials, say so and suggest emailing Dr. Schaefer.
-
-Grades: Do not discuss, speculate about, or help calculate grades. If asked anything grade-related, say: "You'll have to talk with Dr. Schaefer about that one — that's not something I can help with."
-
-Prohibited: Do not solve math problems or equations from assignments. Do not complete WebAssign problems. Do not write papers. Do not complete quizzes or exams. Do not provide direct textbook answers. Do not generate inappropriate content.
-
-Encourage self-sufficiency: Remind students that working through problems themselves — even slowly, even wrong at first — is literally how the brain learns math. Encourage use of the Help Room (323 Strong Hall, M–R 9AM–6PM, F 9AM–4PM) when they need more support.
-
---- SYLLABUS ---
-${SYLLABUS}
-
---- COURSE SCHEDULE ---
-${SCHEDULE}
-
---- TEXTBOOK REFERENCE ---
-${TEXTBOOK}`;
+function updateSendBtn() {
+  const val = document.getElementById("chat-input").value.trim();
+  document.getElementById("send-btn").disabled = isLoading || !val;
 }
 
-function addMsg(role, text) {
-  const d = document.createElement('div');
-  d.className = 'msg ' + role;
-  d.innerHTML = text.replace(/\n/g,'<br>');
-  const msgs = document.getElementById('messages');
-  msgs.appendChild(d);
-  msgs.scrollTop = msgs.scrollHeight;
-  return d;
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
+function quickAsk(text) {
+  document.getElementById("chat-input").value = text;
+  autoResize(document.getElementById("chat-input"));
+  sendMessage();
+}
+
+// ── Minimal markdown ──
+function renderMarkdown(text) {
+  let html = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+
+  const blocks = html.split(/\n{2,}/);
+  return blocks.map(block => {
+    const lines = block.split('\n');
+    const isList = lines.every(l => /^\s*[-*]\s/.test(l) || l.trim() === '');
+    const isNumList = lines.every(l => /^\s*\d+[.)]\s/.test(l) || l.trim() === '');
+    if (isList) {
+      const items = lines.filter(l => l.trim()).map(l => '<li>' + l.replace(/^\s*[-*]\s/, '') + '</li>').join('');
+      return '<ul>' + items + '</ul>';
+    }
+    if (isNumList) {
+      const items = lines.filter(l => l.trim()).map(l => '<li>' + l.replace(/^\s*\d+[.)]\s/, '') + '</li>').join('');
+      return '<ol>' + items + '</ol>';
+    }
+    return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+  }).join('');
+}
+
+// ── Render helpers ──
+function hideEmpty() {
+  const e = document.getElementById("empty-state");
+  if (e) e.style.display = "none";
+}
+
+function addUserMsg(content, index) {
+  hideEmpty();
+  const hist = document.getElementById("chat-history");
+  const el = document.createElement("div");
+  el.className = "user-msg";
+  el.dataset.index = index;
+  el.onclick = () => showResponse(index);
+  const span = document.createElement("span");
+  span.textContent = content;
+  el.appendChild(span);
+  hist.appendChild(el);
+  hist.scrollTop = hist.scrollHeight;
+}
+
+function showResponse(index) {
+  document.querySelectorAll(".user-msg").forEach(m => m.classList.remove("active"));
+  const active = document.querySelector(`.user-msg[data-index="${index}"]`);
+  if (active) active.classList.add("active");
+  const area = document.getElementById("response-area");
+  const entry = responseHistory[index];
+  if (entry) {
+    if (entry.isError) { showErrorNotice(entry.text, area); }
+    else { area.innerHTML = renderMarkdown(entry.text); }
+  }
+}
+
+function setResponseLoading() {
+  document.getElementById("status-dot").className = "response-header-dot loading";
+  document.getElementById("status-label").textContent = "Thinking…";
+  document.getElementById("response-area").innerHTML =
+    '<div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+}
+
+function setResponseReady() {
+  document.getElementById("status-dot").className = "response-header-dot";
+  document.getElementById("status-label").textContent = "Response";
+}
+
+function setResponseError() {
+  document.getElementById("status-dot").className = "response-header-dot error";
+  document.getElementById("status-label").textContent = "Temporary issue";
+}
+
+function showErrorNotice(message, area) {
+  area.innerHTML = `<div class="error-notice"><div class="error-notice-icon">⏳</div><div class="error-notice-text">${message}</div></div>`;
+}
+
+function revealText(text, area) {
+  area.innerHTML = renderMarkdown(text);
+  area.style.opacity = 0;
+  area.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
+  area.scrollTop = 0;
+}
+
+// ── Send ──
 async function sendMessage() {
-  const inp = document.getElementById('user-input');
-  const btn = document.getElementById('send-btn');
-  const text = inp.value.trim();
-  if (!text) return;
-  inp.value = '';
-  btn.disabled = true;
-  addMsg('user', text);
-  STATE.history.push({role:'user', content: text});
-  const thinking = addMsg('bot','⏳ Thinking...');
-  thinking.classList.add('thinking');
+  const inputEl = document.getElementById("chat-input");
+  const text = inputEl.value.trim();
+  if (!text || isLoading) return;
+
+  isLoading = true;
+  updateSendBtn();
+
+  const msgIndex = responseHistory.length;
+  addUserMsg(text, msgIndex);
+  document.querySelectorAll(".user-msg").forEach(m => m.classList.remove("active"));
+  const active = document.querySelector(`.user-msg[data-index="${msgIndex}"]`);
+  if (active) active.classList.add("active");
+
+  conversationHistory.push({ role: "user", content: text });
+  responseHistory.push(null);
+
+  inputEl.value = "";
+  inputEl.style.height = "auto";
+  updateSendBtn();
+  setResponseLoading();
+
   try {
-    const res = await fetch('https://algebra-app.dbward2119.workers.dev/', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:700,
-        system: buildSystemPrompt(),
-        messages: STATE.history
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 700,
+        messages: conversationHistory
       })
     });
-    const data = await res.json();
-    const reply = data.content?.map(b=>b.text||'').join('\n') || 'Sorry, I had trouble responding. Please try again.';
-    thinking.remove();
-    addMsg('bot', reply);
-    STATE.history.push({role:'assistant', content: reply});
-    if (STATE.history.length > 40) STATE.history = STATE.history.slice(-40);
-  } catch(e) {
-    thinking.remove();
-    addMsg('bot','⚠️ Connection error. Please check your network and try again.');
+
+    const data = await response.json();
+
+    if (data.type === "error" || data.error) {
+      const isTemporary = data.error?.type === "overloaded_error" ||
+                          data.error?.type === "rate_limit_error" ||
+                          response.status === 529 || response.status === 429;
+
+      conversationHistory.pop();
+
+      const displayMsg = isTemporary
+        ? "The assistant is temporarily busy. Please wait a moment and try again."
+        : "Something went wrong. Please try again in a moment.";
+
+      responseHistory[msgIndex] = { text: displayMsg, isError: true };
+      isTemporary ? setResponseError() : setResponseReady();
+      showErrorNotice(displayMsg, document.getElementById("response-area"));
+      isLoading = false;
+      updateSendBtn();
+      return;
+    }
+
+    const reply = data.content?.map(b => b.text || "").join("") ||
+      "I received an empty response. Please try asking again.";
+
+    conversationHistory.push({ role: "assistant", content: reply });
+    responseHistory[msgIndex] = { text: reply, isError: false };
+
+    setResponseReady();
+    revealText(reply, document.getElementById("response-area"));
+
+    // Trim history to keep context manageable
+    if (conversationHistory.length > 40) {
+      conversationHistory = conversationHistory.slice(-40);
+    }
+
+  } catch (err) {
+    conversationHistory.pop();
+    const errText = "I'm having trouble connecting right now. Please check your connection and try again.";
+    responseHistory[msgIndex] = { text: errText, isError: true };
+    setResponseError();
+    showErrorNotice(errText, document.getElementById("response-area"));
   }
-  btn.disabled = false;
-  inp.focus();
+
+  isLoading = false;
+  updateSendBtn();
 }
 
-document.getElementById('user-input').addEventListener('keydown', e => {
-  if (e.key==='Enter' && !e.shiftKey){e.preventDefault();sendMessage();}
-});
+document.getElementById("chat-input").addEventListener("input", updateSendBtn);
 </script>
 </body>
 </html>
